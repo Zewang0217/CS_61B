@@ -20,6 +20,14 @@ public class IntListTest {
         assertEquals(threeTwoOne, x);
     }
 
+    /*
+    IntList myList = new IntList(0, null);
+    myList.rest = new IntList(1, null);
+    myList.rest.rest = new IntList(2, null);
+    myList.rest.rest.rest = new IntList(3, null);
+    // One line of using IntList.of() can do the job of four lines!
+    */
+
     @Test
     public void testdSquareList() {
         IntList L = IntList.of(1, 2, 3);

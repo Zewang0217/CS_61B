@@ -50,7 +50,7 @@ public class DebugExercise2 {
         for (int i = 0; i < a.length; i += 1) {
             int biggerValue = max(a[i], b[i]);
             returnArray[i] = biggerValue;
-        }
+        }//返回的是最大绝对值的数，wrong！
 
         return returnArray;
     }

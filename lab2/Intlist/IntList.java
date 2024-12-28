@@ -82,7 +82,15 @@ public class IntList {
 
     public static IntList dcatenate(IntList A, IntList B) {
         //TODO:  fill in method
-        return null;
+        if(A == null){
+            return B;
+        }
+        IntList ptr = A;
+        while (ptr.rest != null){
+            ptr = ptr.rest;
+        }
+        ptr.rest = B;
+        return A;
     }
 
     /**
@@ -91,7 +99,23 @@ public class IntList {
      */
     public static IntList catenate(IntList A, IntList B) {
         //TODO:  fill in method
-        return null;
+        if(A == null){
+            return B;
+        }
+        IntList res = new IntList(A.first,null);
+        IntList ptr = res;
+        //A的第一个元素已经赋值，接下来为剩余元素赋值
+        A = A.rest;
+        //注意！这里是要检查A是否为空
+        while (A != null){
+            ptr.rest = new IntList(A.first,null);
+            A = A.rest;
+            ptr = ptr.rest;
+        }
+        //直接连到B上
+        ptr.rest = B;
+
+        return res;
     }
 
 
