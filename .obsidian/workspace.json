@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "69eb2132fc5de2a1",
+        "id": "14c572b9a03ec688",
         "type": "tabs",
         "children": [
           {
-            "id": "6a3dc110abe7d279",
+            "id": "c681368df8d603f0",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "myNote/2024-12-28.md",
+                "file": "2024-12-29.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2024-12-28"
+              "title": "2024-12-29"
             }
           }
         ]
@@ -162,20 +162,22 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "6a3dc110abe7d279",
+  "active": "c681368df8d603f0",
   "lastOpenFiles": [
+    "lec_exercise/addLastAndSize/SLList.java",
+    "lec_exercise/addLastAndSize/addLastAndSize.iml",
+    "lec_exercise/addLastAndSize",
+    "lec_exercise",
+    "新建文件夹",
     "myNote/simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019.md",
-    "myNote/2024-12-28.md",
+    "2024-12-29.md",
     "myNote/simpread-Lab 1 Setup_ Setting Up Your Computer _ CS 61B Spring 2018.md",
+    "myNote/2024-12-28.md",
+    "myNote/simpread-2.2 The SLList  2 (1).2 sllist_    improvement #5_ caching  改进 #5：缓存 results matching_",
+    "simpread-2.2 The SLList  2.2 sllist_    improvement #5_ caching  改进 #5：缓存 results matching_",
+    "myNote/simpread-2.2 The SLList  2.2 sllist_    improvement #5_ caching  改进 #5：缓存 results matching_",
     "lab2/Intlist/IntList.java~",
     "lab2/out/production/lab2/IntList.class",
-    "lab2/out/production/lab2/DebugExercise2.class",
-    "lab2/DebugExercise3.java",
-    "lab2/DebugPractice/DebugExercise3.java",
-    "lab2/out/production/lab2/IntListTest.class",
-    "lab2/out/production/lab2/DebugExercise1.class",
-    "lab2/DebugPractice/DebugExercise3.java~",
-    "lab2/out/production/lab2/foods.csv",
-    "lab2/out/production/lab2"
+    "lab2/out/production/lab2/DebugExercise2.class"
   ]
 }
