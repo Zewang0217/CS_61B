@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "2024-12-29.md",
+                "file": "myNote/SLLists  SLList.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2024-12-29"
+              "title": "SLLists  SLList"
             }
           }
         ]
@@ -52,7 +52,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:#6b_senitenl_nodes（重点）",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -73,7 +73,8 @@
               "title": "书签"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -93,9 +94,9 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "myNote/simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019.md",
-                "collapseAll": false,
-                "extraContext": false,
+                "file": "myNote/SLLists  SLList.md",
+                "collapseAll": true,
+                "extraContext": true,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
                 "searchQuery": "",
@@ -103,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019 的反向链接列表"
+              "title": "SLLists  SLList 的反向链接列表"
             }
           },
           {
@@ -112,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "myNote/simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019.md",
+                "file": "myNote/SLLists  SLList.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019 的出链列表"
+              "title": "SLLists  SLList 的出链列表"
             }
           },
           {
@@ -139,18 +140,28 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "myNote/simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019.md"
+                "file": "myNote/SLLists  SLList.md"
               },
               "icon": "lucide-list",
-              "title": "simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019 的大纲"
+              "title": "SLLists  SLList 的大纲"
+            }
+          },
+          {
+            "id": "815a8c4749b34626",
+            "type": "leaf",
+            "state": {
+              "type": "todo",
+              "state": {},
+              "icon": "checkmark",
+              "title": "Todo List"
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -164,20 +175,19 @@
   },
   "active": "c681368df8d603f0",
   "lastOpenFiles": [
+    "myNote/simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019.md",
+    "myNote/SLLists  SLList.md",
+    "myNote/2024-12-28.md",
+    "myNote/simpread-Lab 1 Setup_ Setting Up Your Computer _ CS 61B Spring 2018.md",
     "lec_exercise/addLastAndSize/SLList.java",
     "lec_exercise/addLastAndSize/addLastAndSize.iml",
     "lec_exercise/addLastAndSize",
     "lec_exercise",
     "新建文件夹",
-    "myNote/simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019.md",
-    "2024-12-29.md",
-    "myNote/simpread-Lab 1 Setup_ Setting Up Your Computer _ CS 61B Spring 2018.md",
-    "myNote/2024-12-28.md",
     "myNote/simpread-2.2 The SLList  2 (1).2 sllist_    improvement #5_ caching  改进 #5：缓存 results matching_",
     "simpread-2.2 The SLList  2.2 sllist_    improvement #5_ caching  改进 #5：缓存 results matching_",
     "myNote/simpread-2.2 The SLList  2.2 sllist_    improvement #5_ caching  改进 #5：缓存 results matching_",
     "lab2/Intlist/IntList.java~",
-    "lab2/out/production/lab2/IntList.class",
-    "lab2/out/production/lab2/DebugExercise2.class"
+    "lab2/out/production/lab2/IntList.class"
   ]
 }
