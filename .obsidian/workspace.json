@@ -175,19 +175,20 @@
   },
   "active": "c681368df8d603f0",
   "lastOpenFiles": [
+    "lec_exercise/fixAddLast/out/production/fixAddLast/SLList$IntNode.class",
+    "lec_exercise/fixAddLast/out/production/fixAddLast/SLList.class",
+    "lec_exercise/fixAddLast/out/production/fixAddLast/fixAddLast.iml",
+    "lec_exercise/fixAddLast/out/production/fixAddLast",
+    "lec_exercise/fixAddLast/out/production",
+    "lec_exercise/fixAddLast/SLList.java",
+    "lec_exercise/fixAddLast/fixAddLast.iml",
+    "lec_exercise/fixAddLast/out",
+    "lec_exercise/fixAddLast",
     "myNote/simpread-Lab 2_ Unit Testing with JUnit and IntLists _ CS 61B Spring 2019.md",
     "myNote/SLLists  SLList.md",
     "myNote/2024-12-28.md",
     "myNote/simpread-Lab 1 Setup_ Setting Up Your Computer _ CS 61B Spring 2018.md",
     "lec_exercise/addLastAndSize/SLList.java",
-    "lec_exercise/addLastAndSize/addLastAndSize.iml",
-    "lec_exercise/addLastAndSize",
-    "lec_exercise",
-    "新建文件夹",
-    "myNote/simpread-2.2 The SLList  2 (1).2 sllist_    improvement #5_ caching  改进 #5：缓存 results matching_",
-    "simpread-2.2 The SLList  2.2 sllist_    improvement #5_ caching  改进 #5：缓存 results matching_",
-    "myNote/simpread-2.2 The SLList  2.2 sllist_    improvement #5_ caching  改进 #5：缓存 results matching_",
-    "lab2/Intlist/IntList.java~",
-    "lab2/out/production/lab2/IntList.class"
+    "lec_exercise/addLastAndSize/addLastAndSize.iml"
   ]
 }
