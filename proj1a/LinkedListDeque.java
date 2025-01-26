@@ -15,7 +15,7 @@ public class LinkedListDeque<T> {
   public class Node {
     private Node pre;
     private Node next;
-    private final T item;
+    private T item;
 
     /**
      * 创建一个新的节点.
@@ -70,6 +70,21 @@ public class LinkedListDeque<T> {
     sentinel.next = temp;
     temp.pre = sentinel;
     size++;
+  }
+  /**
+   * get recursive.
+   */
+  private T getRecursive(int index, Node currentSentinel) {
+    if (index >= size) {
+      return null;
+    }
+    if (index == 0) {
+      return currentSentinel.next.item;
+    }
+    return getRecursive(index, sentinel);
+  }
+  public T getRecursive(int index) {
+    return getRecursive(index, sentinel);
   }
 
   /**
