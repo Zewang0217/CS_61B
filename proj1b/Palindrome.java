@@ -18,28 +18,52 @@ public class Palindrome {
   }
 
   /**
-   * 帮助判断回文数的私有方法
+   * helper method, return if the first and last characters of
+   * the deque are the same.
    */
-  private String minus(String word) {
-    String a = new String();
-    int k = 0;
-    for (int i = 1; i < word.length() - 1; i++) {
-     a += word.charAt(i);
+  private boolean isPalindrome(Deque<Character> word) {
+    if(word.size() < 2 ) {
+      return true;
     }
-    return a;
+    if (word.removeFirst() != word.removeLast()) {
+      return false;
+    }
+    return isPalindrome(word);
   }
   /**
    * 判断是否为回文数
-   * @param word
+   * @param word words
    * @return boolean
    */
   public boolean isPalindrome(String word) {
-    if (word.length() < 2) {
+    Deque<Character> a = wordToDeque(word);
+    return isPalindrome(a);
+  }
+  /**
+   * Off by one
+   * helper method, return ture if the first and last character
+   * of the deque are offByOne
+   */
+
+  private boolean isPalindrome(Deque<Character> word, CharacterComparator cc) {
+    if (word.size() < 2) {
       return true;
     }
-    if (word.charAt(0) != word.charAt(word.length() - 1)) {
+    if (!cc.equalChars(word.removeFirst(), word.removeLast())) {
       return false;
     }
-    return isPalindrome(minus(word));
+    return isPalindrome(word, cc);
+  }
+  /**
+   * Off by one, the method will return true if the word
+   * is a palindrome according to the character comparison
+   * test provided by the CharacterComparator passed in
+   * as argument cc.
+   * @param cc 字符比较参数
+   */
+  public boolean isPalindrome(String word, CharacterComparator cc) {
+    Deque<Character> a = wordToDeque(word);
+    return isPalindrome(a, cc);
   }
 }
+
