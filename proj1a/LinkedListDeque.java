@@ -1,6 +1,5 @@
 /**
- * 这是CS_61B的双向队列的project.
- * 支持在队列的头部和尾部进行添加和删除操作.
+ * 这是CS_61B的双向队列的project. 支持在队列的头部和尾部进行添加和删除操作.
  *
  * @param <T> 队列中存储的数据类型
  * @author Zewang
@@ -9,10 +8,12 @@
  */
 
 public class LinkedListDeque<T> {
+
   /**
    * 链表中的节点类.
    */
   public class Node {
+
     private Node pre;
     private Node next;
     private T item;
@@ -71,6 +72,7 @@ public class LinkedListDeque<T> {
     temp.pre = sentinel;
     size++;
   }
+
   /**
    * get recursive.
    */
@@ -83,6 +85,7 @@ public class LinkedListDeque<T> {
     }
     return getRecursive(index, sentinel);
   }
+
   public T getRecursive(int index) {
     return getRecursive(index, sentinel);
   }
