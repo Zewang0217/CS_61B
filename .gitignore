@@ -5,6 +5,8 @@
 !**.json
 !.expelimicate
 !.gitignore
+!Note/
+!Note/*.md
 .class
 *.log
 *.ctxt
