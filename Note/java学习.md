@@ -534,3 +534,274 @@ We’ve seen four new features of Java that make generics more powerful:
 
 ------
 
+# `exceptions, iterators, iterables`...
+
+## 6.1 列表、集合、数组集
+
++ 我们从头开始构建了一个列表，但 Java 提供了一个内置的 `List` 接口和几个实现，例如 `ArrayList`。请记住，由于 `List` 是一个接口，因此我们不能初始化它！我们必须实施它的一个实现。
+
++ 要访问它，我们可以使用 classes、interfaces 的全名（'canonical name'）：
+
+```java
+java.util.List<Integer> L = new java.util.ArrayList<>();
+```
+
++ 但是，这有点冗长。与我们导入 `JUnit` 的方式类似，我们可以导入 java 库：
+
+```java
+import java.util.List;
+import java.util.ArrayList;
+
+public class Example {
+    public static void main(String[] args) {
+        List<Integer> L = new ArrayList<>();
+        L.add(5);
+        L.add(10);
+        System.out.println(L);
+    }
+}
+```
+
+### sets 集
+
++ 集是唯一元素的集合 - 每个元素只能有一个副本。也没有顺序。
+
++ Java 具有 `Set` 接口以及 `HashSet` 等实现。如果您不想使用全名，请记得导入它们！
+
+  ```java
+  import java.util.Set;
+  import java.util.HashSet;
+  ```
+
++ 示例使用：
+
+  ```java
+  Set<String> s = new HashSet<>();
+  s.add("Tokyo");
+  s.add("Lagos");
+  System.out.println(S.contains("Tokyo")); // true
+  ```
+
+### 数组集 `ArraySet`
+
++ 目的：制作自己的`ArraySet`：
+  + `add(value)`: add the value to the set if not already present
+  + `contains(value)`: check to see if `ArraySet` contains the key
+  + `size()`: return number of values
+
+```java
+public class ArraySet<T> {
+
+    private T[] items;
+    private int size;
+
+    public ArraySet() {
+        items = (T[]) new Object[100];
+        size = 0;
+    }
+
+    /* Returns true if this map contains a mapping for the specified key.
+     */
+    public boolean contains(T x) {
+        for (int i = 0; i < size; i++) {
+            if (items[i].equals(x)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* Associates the specified value with the specified key in this map.
+       Throws an IllegalArgumentException if the key is null. */
+    public void add(T x) {
+        if (x == null) return;
+        if (contains(x)) return;
+        items[size] = x;
+        size++;
+    }
+
+    /* Returns the number of key-value mappings in this map. */
+    public int size() {
+        return size;
+    }
+
+    public static void main(String[] args) {
+        ArraySet<String> s = new ArraySet<>();
+        s.add(null);
+        s.add("horse");
+        s.add("fish");
+        s.add("house");
+        s.add("fish");
+        System.out.println(s.contains("horse"));
+        System.out.println(s.size());
+    }
+
+    /* Also to do:
+    1. Make ArraySet implement the Iterable<T> interface.
+    2. Implement a toString method.
+    3. Implement an equals() method.
+    */
+}
+```
+
+## 6.2 Throwing Exceptions 引发异常
+
+```java
+throw new ExceptionObject(parameter1, ...)
+```
+
+```java
+throw new IllegalArgumentException("can't add null");
+```
+
+## 6.3 iteration 迭代
+
+### 增强的for循环
+
++ 关键：一个叫`iterator`的对象
+
++ 对于我们的示例，在 List.java 中，我们可以定义一个返回迭代器对象的 `iterator（）` 方法。
+  ```java
+  public Iterator<E> iterator();
+  ```
+
+  我们的迭代器方法有三种关键方法：
+
+  + 首先，我们得到一个新的迭代器对象，其中包含 `Iterator<Integer> seer = friends.iterator();`
+  + 接下来，我们使用 while 循环遍历列表。我们使用 `seer.hasNext（）` 检查是否仍有剩余项目，如果剩余未看见的项目，则返回 true，如果所有项目都已处理完，则返回 false。
+  + 最后，`seer.next（）` 同时执行两项作。它返回列表的下一个元素，在这里我们将其打印出来。它还将迭代器前进一项。这样，迭代器将只检查每个项目一次。
+
+### 实现迭代器
+
+```java
+List<Integer> friends = new ArrayList<Integer>();
+Iterator<Integer> seer = friends.iterator();
+
+while(seer.hasNext()) {
+    System.out.println(seer.next());
+}
+```
+
+考虑两点：
+
++ List 接口有 iterator（） 方法吗？
++ Iterator 接口有 `next` / `hasNext`（） 方法吗？
+
++ `Iteratabl`迭代接口
+
++ 支持迭代的 `ArraySet` 代码如下：
+
+```java
+import java.util.Iterator;
+
+public class ArraySet<T> implements Iterable<T> {
+    private T[] items;
+    private int size; // the next item to be added will be at position size
+
+    public ArraySet() {
+        items = (T[]) new Object[100];
+        size = 0;
+    }
+
+    /* Returns true if this map contains a mapping for the specified key.
+     */
+    public boolean contains(T x) {
+        for (int i = 0; i < size; i += 1) {
+            if (items[i].equals(x)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* Associates the specified value with the specified key in this map.
+       Throws an IllegalArgumentException if the key is null. */
+    public void add(T x) {
+        if (x == null) {
+            throw new IllegalArgumentException("can't add null");
+        }
+        if (contains(x)) {
+            return;
+        }
+        items[size] = x;
+        size += 1;
+    }
+
+    /* Returns the number of key-value mappings in this map. */
+    public int size() {
+        return size;
+    }
+
+    /** returns an iterator (a.k.a. seer) into ME */
+    public Iterator<T> iterator() {
+        return new ArraySetIterator();
+    }
+
+    private class ArraySetIterator implements Iterator<T> {
+        private int wizPos;
+
+        public ArraySetIterator() {
+            wizPos = 0;
+        }
+
+        public boolean hasNext() {
+            return wizPos < size;
+        }
+
+        public T next() {
+            T returnItem = items[wizPos];
+            wizPos += 1;
+            return returnItem;
+        }
+    }
+
+    public static void main(String[] args) {
+        ArraySet<Integer> aset = new ArraySet<>();
+        aset.add(5);
+        aset.add(23);
+        aset.add(42);
+
+        //iteration
+        for (int i : aset) {
+            System.out.println(i);
+        }
+    }
+
+}
+```
+
+### 6.3总结
+
+#### 为什么要使用 Iterator 才可以使用增强 for 循环（实现原理）？
+
+增强型 for 循环的底层实现依赖于 `Iterable` 和 `Iterator` 接口。当你使用增强型 for 循环时，编译器会自动将其转换为使用 `Iterator` 的代码。例如：
+
+```java
+for (String city : s) {
+    System.out.println(city);
+}
+```
+
+会被转换为：
+
+```java
+Iterator<String> seer = s.iterator();
+while (seer.hasNext()) {
+    String city = seer.next();
+    System.out.println(city);
+}
+```
+
+因此，只有实现了 `Iterable` 接口的类才能使用增强型 for 循环。
+
+#### `Iterator` 和 `Iterable `是什么？
+
+- **`Iterable`**: 这是一个接口，表示一个类可以被迭代。它只有一个方法 `iterator()`，返回一个 `Iterator` 对象。实现了 `Iterable` 接口的类可以使用增强型 for 循环。
+- **`Iterator`**: 这也是一个接口，表示一个迭代器。它有两个主要方法：
+  - `hasNext()`: 检查是否还有更多的元素可以遍历。
+  - `next()`: 返回当前元素并将迭代器移动到下一个元素。
+
+
+
++ 要想使用迭代器，需要实现 `Iterator` 和 `Iterable`接口（共三个主要函数）
++ 关注增强for循环底层逻辑（迭代器）
