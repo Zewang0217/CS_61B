@@ -805,3 +805,496 @@ while (seer.hasNext()) {
 
 + 要想使用迭代器，需要实现 `Iterator` 和 `Iterable`接口（共三个主要函数）
 + 关注增强for循环底层逻辑（迭代器）
+
+## 6.4 对象方法 Object Methods 
+
++ 所有类都继承自总体Object类，继承方法如下：
+
+> - `String toString()`
+> - `boolean equals(Object obj)`
+> - `Class <?> getClass()`
+> - `int hashCode()`
+> - `protected Objectclone()`
+> - `protected void finalize()`
+> - `void notify()`
+> - `void notifyAll()`
+> - `void wait()`
+> - `void wait(long timeout)`
+> - `void wait(long timeout, int nanos)`
+
+### `toString()`
+
++ `toString（）` 方法提供对象的字符串表示形式。`System.out.println（）` 函数在传递给它的任何对象上隐式调用此方法，并打印返回的字符串。当您运行 `System.out.println（dog）` 时，它实际上是在执行以下作：
+
+  ```java
+  String s = dog.toString()
+  System.out.println(s)
+  ```
+
++ 对于我们自己编写的类，如 `ArrayDeque`、`LinkedListDeque` 等，如果我们想看到以可读格式打印的对象，我们需要提供自己的 `toString（）` 方法。
++ 编写之前，输出样式：
+  ![image-20250319203613128](C:\Users\zewan\AppData\Roaming\Typora\typora-user-images\image-20250319203613128.png)
+
++ 编写过程
+
+  + 初步想法：
+    ```java
+    @Override
+        public String toString() {
+            String returnString = "{";
+            for (int i = 0; i < size; i++) {
+                returnString += items[i];
+                returnString += ", ";
+            }
+            returnString += "}";
+            return returnString;
+        }
+    ```
+
+    + 问题：效率低下（重新创建了一个string并逐个线性添加）
+
+  + 解决方法：Java 有一个名为 `StringBuilder` 的特殊类。它会创建一个可变的字符串对象，因此您可以继续附加到同一个字符串对象，而不是每次都创建一个新对象。
+
+    ```java
+    @Override
+        public String toString() {
+            StringBuilder returnSB = new StringBuilder();
+            for (int i = 0; i < size - 1; i++) {
+                returnSB.append(items[i].toString());
+                returnSB.append(", ");
+            }
+            returnSB.append(items[size - 1].toString());
+            returnSB.append("}");
+            return returnSB.toString();
+        }
+    ```
+
+    注： `StringBuilder`是java的核心包的一部分，不用显式导入
+
+  + 编写之后输出：
+
+  + ```
+    {1, 2, 3}
+    ```
+
+### `equals()`
+
++ `equals（）` 和 `==` 在 Java 中具有不同的行为。`==`检查两个对象是否实际上是内存中的同一对象。请记住，按值传递！`==` 检查两个盒子是否包含相同的内容。对于基元，这意味着检查值是否相等。对于对象，这意味着检查地址/指针是否相等。
+
++ `equals（Object o）` 是 Object 中的一个方法，默认情况下，它的作用类似于 ==，因为它检查 this 的内存地址是否与 o 相同。但是，我们可以重写它以我们想要的任何方式定义相等！例如，要使两个 `Arraylist` 被视为相等，它们只需要具有相同顺序的相同元素。
+
++ 实现：
+  ```java
+  @Override
+      public boolean equals(Object other) {
+          if (this == other) {
+              return true;
+          }
+          if (other == null) {
+              return false;
+          }
+          if (other.getClass() != this.getClass()) {
+              return false;
+          }
+  
+          ArraySet<T> o = (ArraySet<T>) other;
+          if (o.size() != this.size()) {
+              return false;
+          }
+  
+          for (T item : items) {
+              if (!o.contains(item)) {
+                  return false;
+              }
+          }
+          return true;
+      }
+  ```
+
++ 事实上，在java中要重写 `.equals()`方法时，要遵守几条规则：
+
+  + equals必须时等价关系
+    + **自反**：  `x.equals（x）` 为 true
+    + **对称**：当且仅当 `y.equals（x）` 时 `x.equals（y）`
+    + **传递**：`x.equals（y）` 和 `y.equals（z）` 表示 `x.equals（z）`
+  + 它必须接受Object参数，以便重写方法
+  +  如果 `x.equals（y）` 则它必须是一致的，那么只要 `x` 和 `y` 保持不变： `x` 必须继续等于 `y`
+  + 对于 null **从来都不是真的** `x.equals（null）` 必须为 false
+
+### extra
+
++ `tostring()`另外实现
+
++ ```java
+  @Override
+  public String toString() {
+      List<String> listOfItems = new ArrayList<>();
+      for (T x : this) {
+          listOfItems.add(x.toString());
+      }
+      return "{" + String.join(", ", listOfItems) + "}";
+  } 
+  ```
+
++ 静态工厂方法of
+
+  + 静态工厂方法 `of` 是一种常见的设计模式，用于创建对象实例。它通常用于提供一种更简洁、更灵活的方式来创建对象，而不是直接使用构造函数。
+
+  + 静态工厂方法 `of` 的主要作用是：
+
+    - **简化对象创建**：
+      - 提供一种更直观的方式来创建对象，尤其是当构造函数参数较多或复杂时。
+    - **隐藏实现细节**：
+      - 封装对象的创建逻辑，调用者无需关心具体的实现细节。
+    - **支持不可变对象**：
+      - 常用于创建不可变对象（如 `List.of()`、`Set.of()` 等）。
+    - **提供命名**：
+      - 静态工厂方法可以有描述性的名称（如 `of`、`create`、`newInstance` 等），使代码更易读。
+
+  + ### **静态工厂方法 `of` 的实现**
+
+    ```java
+    public static <Glerp> ArraySet<Glerp> of(Glerp... stuff) {
+        ArraySet<Glerp> returnSet = new ArraySet<Glerp>();
+        for (Glerp x : stuff) {
+            returnSet.add(x);
+        }
+        return returnSet;
+    }
+    ```
+
+    #### 代码解析：
+
+    1. **方法签名**：
+
+       - `public static <Glerp> ArraySet<Glerp> of(Glerp... stuff)`：
+         - `public static`：静态方法，可以通过类名直接调用。
+         - `<Glerp>`：泛型类型参数，表示方法可以处理任意类型的元素。
+         - `ArraySet<Glerp>`：返回一个 `ArraySet` 实例，其元素类型为 `Glerp`。
+         - `Glerp... stuff`：可变参数，**允许传入任意数量**的 `Glerp` 类型参数。
+
+    2. **方法逻辑**：
+
+       - 创建一个新的 `ArraySet<Glerp>` 实例。
+       - 遍历可变参数 `stuff`，将每个元素添加到 `ArraySet` 中。
+       - 返回填充好的 `ArraySet`。
+
+    3. **示例用法**：
+
+       java
+
+       ```java
+       ArraySet<String> asetOfStrings = ArraySet.of("hi", "I'm", "here");
+       System.out.println(asetOfStrings);
+       ```
+
+       输出：
+
+       ```
+       {hi, I'm, here}
+       ```
+
++ **静态工厂方法的适用场景**
+
+  1. **创建不可变对象**：
+     - 静态工厂方法常用于创建不可变对象（如 `List.of()`、`Set.of()`）。
+  2. **简化对象创建**：
+     - 当构造函数参数较多或复杂时，静态工厂方法可以提供更简洁的调用方式。
+  3. **隐藏实现细节**：
+     - 当对象的创建逻辑较复杂时，可以使用静态工厂方法封装细节。
+  4. **支持缓存**：
+     - 静态工厂方法可以实现对象缓存（如 `Integer.valueOf()`）。
+
+## 捕获异常
+
+ **`try` 和 `catch` 的基本语法**
+
+```java
+try {
+    // 可能抛出异常的代码
+} catch (ExceptionType e) {
+    // 处理异常的代码
+}
+```
+
+- **`try` 块**：
+  - 包含可能抛出异常的代码。
+  - 如果 `try` 块中的代码抛出了异常，程序会立即跳转到对应的 `catch` 块。
+- **`catch` 块**：
+  - 捕获并处理特定类型的异常。
+  - `ExceptionType` 是异常的类型（如 `NullPointerException`、`ArithmeticException` 等）。
+  - `e` 是异常对象，可以用于获取异常的详细信息。
+
++ 补充
+
+> ###  **`catch` 块的多个异常类型**
+>
+> 可以为一个 `try` 块添加多个 `catch` 块，以捕获不同类型的异常：
+>
+> ```java
+> try {
+>     int[] arr = {1, 2, 3};
+>     System.out.println(arr[5]); // 可能抛出 ArrayIndexOutOfBoundsException
+>     int result = divide(10, 0); // 可能抛出 ArithmeticException
+> } catch (ArrayIndexOutOfBoundsException e) {
+>     System.out.println("Array index out of bounds: " + e.getMessage());
+> } catch (ArithmeticException e) {
+>     System.out.println("Arithmetic error: " + e.getMessage());
+> }
+> ```
+>
+> #### 输出：
+>
+> ```java
+> Array index out of bounds: Index 5 out of bounds for length 3
+> ```
+>
+> ------
+>
+> ### finally` 块**
+>
+> `finally` 块用于定义无论是否发生异常都必须执行的代码：
+>
+> ```java
+> try {
+>     int result = divide(10, 0);
+> } catch (ArithmeticException e) {
+>     System.out.println("Error: " + e.getMessage());
+> } finally {
+>     System.out.println("This will always run.");
+> }
+> ```
+>
+> #### 输出：
+>
+> ```java
+> Error: / by zero
+> This will always run.
+> ```
+>
+> - **`finally` 的作用**：
+>   - 通常用于释放资源（如关闭文件、数据库连接等）。
+>   - 无论是否发生异常，`finally` 块中的代码都会执行。
+>
+> ------
+>
+> ### **捕获所有异常**
+>
+> 可以使用 `Exception` 类捕获所有类型的异常：
+>
+> ```java
+> try {
+>     int[] arr = {1, 2, 3};
+>     System.out.println(arr[5]); // 可能抛出 ArrayIndexOutOfBoundsException
+>     int result = divide(10, 0); // 可能抛出 ArithmeticException
+> } catch (Exception e) {
+>     System.out.println("An error occurred: " + e.getMessage());
+> }
+> ```
+>
+> #### 输出：
+>
+> ```java
+> An error occurred: Index 5 out of bounds for length 3
+> ```
+>
+> - **注意**：
+>   - 捕获所有异常可能会导致代码难以调试，因此应尽量避免滥用。
+>
+> ------
+>
+> ### **自定义异常**
+>
+> 除了捕获 Java 内置的异常，还可以自定义异常类：
+>
+> ```java
+> class CustomException extends Exception {
+>     public CustomException(String message) {
+>         super(message);
+>     }
+> }
+> 
+> public class Main {
+>     public static void main(String[] args) {
+>         try {
+>             throw new CustomException("This is a custom exception!");
+>         } catch (CustomException e) {
+>             System.out.println("Caught custom exception: " + e.getMessage());
+>         }
+>     }
+> }
+> ```
+>
+> #### 输出：
+>
+> ```java
+> Caught custom exception: This is a custom exception!
+> ```
+
+
+
+## Checked vs. Unchecked Exceptions
+
+在 Java 中，异常分为两类：**Checked Exceptions（已检查异常）** 和 **Unchecked Exceptions（未检查异常）**。以下是它们的核心区别以及如何处理它们：
+
+------
+
+1. **Checked Exceptions（已检查异常）**
+
+- **定义**：
+
+  - 编译器强制要求处理的异常。
+  - 必须在代码中显式捕获（`catch`）或声明抛出（`throws`），否则代码无法编译。
+
+- **特点**：
+
+  - 通常是**外部因素**导致的错误，例如文件不存在（`FileNotFoundException`）、网络连接失败（`IOException`）等。
+  - 编译器认为这些异常是可以预见的，因此要求程序员必须处理。
+
+- **示例**：
+
+  ```java
+  public void readFile() throws IOException {
+      FileReader file = new FileReader("example.txt"); // 可能抛出 IOException
+  }
+  ```
+
+- **处理方式**：
+
+  1. **捕获异常（`catch`）**：
+
+     ```java
+     try {
+         FileReader file = new FileReader("example.txt");
+     } catch (IOException e) {
+         System.out.println("File not found!");
+     }
+     ```
+
+  2. **声明抛出（`throws`）**：
+
+     ```java
+     public void readFile() throws IOException {
+         FileReader file = new FileReader("example.txt");
+     }
+     ```
+
+------
+
+2. **Unchecked Exceptions（未检查异常）**
+
+- **定义**：
+
+  - 编译器不强制要求处理的异常。
+  - 通常是程序逻辑错误导致的，例如空指针（`NullPointerException`）、数组越界（`ArrayIndexOutOfBoundsException`）等。
+
+- **特点**：
+
+  - 这些异常在运行时才会被发现，编译器无法提前检查。
+  - 通常是程序员错误导致的，无法通过外部手段修复。
+
+- **示例**：
+
+  ```java
+  public void divide(int a, int b) {
+      if (b == 0) {
+          throw new ArithmeticException("Division by zero!"); // 运行时抛出异常
+      }
+      System.out.println(a / b);
+  }
+  ```
+
+- **处理方式**：
+
+  - 可以选择捕获，但通常建议修复代码逻辑，而不是依赖异常处理。
+
+------
+
+3. **Checked vs. Unchecked 的区别**
+
+| **特性**               | **Checked Exceptions**             | **Unchecked Exceptions**                      |
+| :--------------------- | :--------------------------------- | :-------------------------------------------- |
+| **编译器是否强制处理** | 是                                 | 否                                            |
+| **常见类型**           | `IOException`, `SQLException`      | `NullPointerException`, `ArithmeticException` |
+| **原因**               | 外部因素（如文件不存在、网络问题） | 程序逻辑错误（如空指针、除零）                |
+| **处理方式**           | 必须捕获或声明抛出                 | 可选捕获，通常修复代码逻辑                    |
+
+------
+
+4. **如何选择使用 Checked 还是 Unchecked 异常？**
+
+- **使用 Checked Exceptions**：
+  - 当异常是可以预见的，并且调用者有可能恢复或处理时。
+  - 例如：文件操作、网络请求等。
+- **使用 Unchecked Exceptions**：
+  - 当异常是由于程序逻辑错误导致的，调用者无法恢复时。
+  - 例如：空指针、数组越界等。
+
+------
+
+5. **最佳实践**
+
+1. **捕获异常时**：
+   - 尽量捕获具体的异常类型，而不是直接捕获 `Exception`。
+   - 在 `catch` 块中处理异常，而不是简单地打印堆栈信息。
+2. **声明抛出异常时**：
+   - 如果方法内部无法处理异常，可以通过 `throws` 将异常抛给调用者处理。
+   - 确保调用者知道方法可能抛出哪些异常。
+3. **避免滥用 Checked Exceptions**：
+   - 如果异常是程序逻辑错误导致的，使用 `RuntimeException` 或其子类。
+   - 过多的 Checked Exceptions 会导致代码冗长且难以维护。
+
+------
+
+6. **示例代码**
+
+Checked Exception 示例：
+
+```java
+public void readFile(String path) throws IOException {
+    FileReader file = new FileReader(path); // 可能抛出 IOException
+    // 其他操作
+}
+
+public static void main(String[] args) {
+    try {
+        readFile("example.txt");
+    } catch (IOException e) {
+        System.out.println("Error reading file: " + e.getMessage());
+    }
+}
+```
+
+Unchecked Exception 示例：
+
+```java
+public void divide(int a, int b) {
+    if (b == 0) {
+        throw new ArithmeticException("Division by zero!"); // 运行时抛出异常
+    }
+    System.out.println(a / b);
+}
+
+public static void main(String[] args) {
+    try {
+        divide(10, 0);
+    } catch (ArithmeticException e) {
+        System.out.println("Error: " + e.getMessage());
+    }
+}
+```
+
+------
+
+7. **总结**
+
+- **Checked Exceptions**：
+  - 编译器强制要求处理。
+  - 通常是外部因素导致的错误。
+  - 必须通过 `catch` 或 `throws` 处理。
+- **Unchecked Exceptions**：
+  - 编译器不强制要求处理。
+  - 通常是程序逻辑错误导致的。
+  - 可以选择捕获，但通常建议修复代码逻辑。
+
+通过合理使用 Checked 和 Unchecked Exceptions，可以编写出更健壮、更易维护的代码。
