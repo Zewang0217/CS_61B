@@ -1298,3 +1298,581 @@ public static void main(String[] args) {
   - 可以选择捕获，但通常建议修复代码逻辑。
 
 通过合理使用 Checked 和 Unchecked Exceptions，可以编写出更健壮、更易维护的代码。
+
+# 七、软件包和访问控制 Packages and Access Control
+
+## 7.1 包和JAR文件 packages and JAR files
+
+### package
+
++ 一个组织类和接口的命名空间。
+
++ 通常，在创建包时，您应该遵循以下命名约定：包名为网站地址倒过来。
+
+```
+ug.joshh.animal; // note: his website is joshh.ug
+com.baidu
+```
+
+### 使用包
+
++ 从同一个包中访问类：
+  ```java
+  Dog d = new Dog(...)
+  ```
+
++ 从包外部访问类：
+  ```java
+  ug.joshh.animal.Dog d = new ug.joshh.animal.Dog(...)
+  ```
+
++ 简化操作——提前导入包：
+  ```java
+  import ug.joshh.animal.Dog(...)
+      ...
+  Dog d = new Dog(...)
+  ```
+
+### 创建包
+
++ 两个步骤：
+
+  1、将包的名字放在此包每个文件的顶部：
+
+  ```java
+  package ug.joshh.animal;
+  
+  public class Dog{
+      private String name;
+      private String breed;
+      ...
+  }
+  ```
+
+  2、将文件存储再2具有相应文件夹名称的文件夹内
+
+### 在 `inteliJ` 中创建包
+
+1、右键单击 `Package name`
+
+2、选择 `New -> Java Class`
+
+
+
+### 默认软件包Default packages
+
++ 任何在文件顶部没有明确包名的Java类都会自动被视为“default”的一部分。
++ 尽量避免
+
+### Jar文件
+
+- 通常，程序包含多个`.class`文件。如果要共享这个程序，而不是共享所以的class文件，可以创建JAR文件将所有文件压缩到一起。
+- 创建方法
+  +  Go to File → Project Structure → Artifacts → JAR → “From modules with dependencies”
+  +  Click OK a couple of times
+  + Click Build → Build Artifacts (this will create a JAR file in a folder called “Artifacts”)
+  +  Distribute this JAR file to other Java programmers, who can now import it into IntelliJ (or otherwise)
+
++ 构建系统
+
+## 7.2 访问控制 Access Control
+
+### private
+
++ 只有给定类中的代码才可以访问私有成员。它对其他所有内容都是真正私有的，因为**子类、包和其他外部类**无法访问私有成员。
++ 总结：只有类本身需要这段代码
+
+### Package Private
+
++ 如果没有显示修饰符，这是Java成员**默认**访问权限。包私有意味着属于**同一个包的类**可以访问这些成员，但子类不能。
++ 总结：只有位于同一个包中的类才能访问
+
+### Protected
+
++ 受保护的对象对外部世界是受保护的，因此**同一个包中的类**和子类可以访问这些成员，但外部世界（例如包外部的类或非子类）不行。
++ 总结：子类可能需要它，但子类的客户端不需要
+
+### public
+
++ 所有人都可以访问
+
+### 注意事项
+
++ Default package 默认包
+  + 没有包声明的代码会自动成为默认包的一部分。如果这些类的成员没有访问修饰符（即**包私有**），那么由于所有内容都属于同一个（未命名的）默认包，这些成员**仍然可以在这些“默认”包类之间访问**。
+  + 尽量避免
++ 访问仅基于**静态类型**
+  + 访问权限是基于静态类型（编译时类型）而不是动态类型（运行时类型）的
++ **接口**中的方法
+  - 接口中的**方法****默认是 `public`** 的，即使不写修饰符。
+  - 接口中的**变量默认是 `public static fina**l` 的。
+
+#### **访问控制的总结表格**
+
+| 修饰符           | 本类 | 同一包 | 子类 | 其他包 |
+| :--------------- | :--- | :----- | :--- | :----- |
+| `public`         | ✔️    | ✔️      | ✔️    | ✔️      |
+| `protected`      | ✔️    | ✔️      | ✔️    | ❌      |
+| `默认（包私有）` | ✔️    | ✔️      | ❌    | ❌      |
+| `private`        | ✔️    | ❌      | ❌    | ❌      |
+
+# 八、高效性编程
+
+## 8.1 封装、API和抽象数据类型ADT
+
++ 高效编程体现在两个方面：
+  1. **编程成本**
+     - 开发程序需要多长时间？
+     - 代码是否易于阅读、修改和维护？
+  2. **执行成本**（从下周开始讨论）
+     - 程序执行需要多少时间？
+     - 程序需要多少内存？
+
+------
+
+### 一些有用的 Java 特性（在 61B 中讨论过）
+
+1. **包（Packages）**
+   - **优点**：组织代码，使某些内容包私有。
+   - **缺点**：过于具体。
+2. **静态类型检查（Static Type Checking）**
+   - **优点**：早期检查错误，代码更易读。
+   - **缺点**：不够灵活（例如需要类型转换）。
+3. **继承（Inheritance）**
+   - **优点**：代码复用。
+   - **缺点**：“是一个”关系，调试路径复杂，无法实例化，必须实现接口的所有方法。
+
+------
+
+### 封装
+
++ 模块`module`：
+  一组协同工作以完成某项任务或相关任务的方法
++ 封装`Encapsulated`：
+  如果一个模块的实现完全隐藏，只能通过文档化的接口访问，则称该模块是封装的
+
+------
+
+### API（应用程序编程接口）
+
++ API 是抽象数据类型（ADT）的构造函数和方法列表，以及每个方法的简短描述。
++ API 包括语法规范和语义规范：
+  - **语法规范**：编译器验证语法是否正确（即 API 中指定的所有内容是否存在）。
+  - **语义规范**：测试帮助验证语义是否正确（即一切是否按预期工作）。语义规范通常用英语描述（可能包括使用示例），数学上精确的形式规范虽然可能，但并不普遍。
+
+------
+
+### ADT（抽象数据类型）
+
++ ADT 是高级类型，由其行为定义，而不是其实现。
+
++ 例如，Proj1 中的 `Deque` 是一个 ADT，它具有某些行为（如 `addFirst`、`addLast` 等），但我们实际用于实现它的数据结构是 `ArrayDeque` 和 `LinkedListDeque`。
+
++ 一些 ADT 实际上是其他 ADT 的特殊情况。例如，栈（Stack）和队列（Queue）只是具有更特定行为的列表。
+
+------
+
+### 练习 8.1.1
+
+编写一个使用链表作为底层数据结构的 `Stack` 类。你只需要实现一个方法：`push(Item x)`。确保使类具有泛型，`Item` 是泛型类型！
+
+以下是三种常见的实现方式：
+
+#### 1. 扩展（Extension）
+
+```java
+public class ExtensionStack<Item> extends LinkedList<Item> {
+    public void push(Item x) {
+        add(x);
+    }
+}
+```
+
+- **特点**：直接继承 `LinkedList<Item>` 的方法并使用它们。
+
+#### 2. 委托（Delegation）
+
+```java
+public class DelegationStack<Item> {
+    private LinkedList<Item> L = new LinkedList<Item>();
+    public void push(Item x) {
+        L.add(x);
+    }
+}
+```
+
+- **特点**：创建一个链表对象并调用其方法来实现目标。
+
+#### 3. 适配器（Adapter）
+
+```java
+public class StackAdapter<Item> {
+    private List L;
+    public StackAdapter(List<Item> worker) {
+        L = worker;
+    }
+
+    public void push(Item x) {
+        L.add(x);
+    }
+}
+```
+
+- **特点**：可以使用任何实现 `List` 接口的类（如 `LinkedList`、`ArrayList` 等）。
+
++ 注意：在委托和扩展之间，委托是通过传入一个类来实现的，而扩展是通过继承实现的（尽管乍一看可能很难注意到）
+
+### 委托 vs 扩展
+
+目前来看，委托和扩展似乎可以互换，但在使用时必须记住一些重要区别：
+
+- **扩展**：当你了解父类的实现细节时使用。换句话说，你知道方法的实现方式。此外，扩展意味着你正在扩展的类与扩展它的类行为相似。
+- **委托**：当你不希望当前类被视为你从中提取方法的类的版本时使用。
+
+### 视图（Views）
+
+视图是现有对象的替代表示。视图本质上限制了用户对底层对象的访问。然而，通过视图所做的更改会影响实际对象。
+
+例如：
+
+```java
+List<String> L = new ArrayList<>();
+L.add("at"); L.add("ax"); ...
+List<String> SL = L.subList(1, 4);
+SL.set(0, "jug");
+```
+
+- **用途**：例如，如果我们只想反转列表的一部分，可以使用子列表视图来实现。
+
+### 补充：委托、适配器、视图的再介绍
+
+> ## 1. 委托（Delegation）
+>
+> ### 定义
+>
+> 委托是一种设计模式，通过将一个类的功能委托给另一个类的对象来实现。换句话说，一个类不直接实现某些功能，而是将这些功能交给另一个类的对象来完成。
+>
+> ### 核心思想
+>
+> - **“有一个”关系**：一个类持有另一个类的对象，并通过调用该对象的方法来完成工作。
+> - **代码复用**：通过委托，可以复用其他类的功能，而不需要继承。
+>
+> ### 理解：
+>
+> + 创建一个委托类，存放操作类，在委托类中实现功能
+>
+> ### 示例
+>
+> 假设我们有一个 `Printer` 类，负责打印内容。我们可以通过委托的方式，将打印功能交给 `Printer` 类的对象来完成。
+>
+> ```java
+> // 打印机类
+> class Printer {
+>     public void print(String document) {
+>         System.out.println("打印内容: " + document);
+>     }
+> }
+> 
+> // 办公室类，委托 Printer 类来完成打印
+> class Office {
+>     private Printer printer; // 委托对象
+> 
+>     public Office(Printer printer) {
+>         this.printer = printer;
+>     }
+> 
+>     public void printDocument(String document) {
+>         // 委托 Printer 对象完成打印
+>         printer.print(document);
+>     }
+> }
+> 
+> // 测试
+> public class Main {
+>     public static void main(String[] args) {
+>         Printer printer = new Printer();
+>         Office office = new Office(printer);
+>         office.printDocument("年度报告"); // 输出: 打印内容: 年度报告
+>     }
+> }
+> ```
+>
+> ### 优点
+>
+> - **灵活性**：可以动态更换委托对象。
+> - **解耦**：将功能分离到不同的类中，降低耦合度。
+>
+> ### 缺点
+>
+> - **代码量增加**：需要显式创建委托对象并调用其方法。
+>
+> ------
+>
+> ## 2. 适配器（Adapter）
+>
+> ### 定义
+>
+> 适配器是一种结构型设计模式，用于将一个类的接口转换成客户端期望的另一个接口。适配器通常用于解决接口不兼容的问题。
+>
+> ### 核心思想
+>
+> - **接口转换**：通过适配器类，将不兼容的接口转换为兼容的接口。
+> - **复用现有代码**：适配器模式可以复用现有的类，而不需要修改其代码。
+>
+> ### 理解：
+>
+> + 用适配器让旧的类实现新的接口
+>
+> ### 示例
+>
+> 假设我们有一个 `LegacyPrinter` 类，它的打印方法与新系统的接口不兼容。我们可以通过适配器模式来解决这个问题。
+>
+> ```java
+> // 旧打印机类
+> class LegacyPrinter {
+>     public void printDocument(String text) {
+>         System.out.println("旧打印机打印: " + text);
+>     }
+> }
+> 
+> // 新系统的打印接口
+> interface Printer {
+>     void print(String document);
+> }
+> 
+> // 适配器类，将 LegacyPrinter 适配到 Printer 接口
+> class PrinterAdapter implements Printer {
+>     private LegacyPrinter legacyPrinter;
+> 
+>     public PrinterAdapter(LegacyPrinter legacyPrinter) {
+>         this.legacyPrinter = legacyPrinter;
+>     }
+> 
+>     @Override
+>     public void print(String document) {
+>         // 调用 LegacyPrinter 的方法
+>         legacyPrinter.printDocument(document);
+>     }
+> }
+> 
+> // 测试
+> public class Main {
+>     public static void main(String[] args) {
+>         LegacyPrinter legacyPrinter = new LegacyPrinter();
+>         Printer printer = new PrinterAdapter(legacyPrinter);
+>         printer.print("新报告"); // 输出: 旧打印机打印: 新报告
+>     }
+> }
+> ```
+>
+> ### 优点
+>
+> - **兼容性**：可以让不兼容的接口一起工作。
+> - **复用性**：可以复用现有的类，而不需要修改其代码。
+>
+> ### 缺点
+>
+> - **复杂性增加**：引入了额外的适配器类，增加了代码的复杂性。
+>
+> ------
+>
+> ## 3. 视图（Views）
+>
+> ### 定义
+>
+> 视图是一种设计模式，用于提供对底层数据的特定表示或访问方式。视图通常用于限制或转换对数据的访问。
+>
+> ### 核心思想
+>
+> - **数据封装**：视图隐藏了底层数据的实现细节，只暴露特定的接口。
+> - **动态更新**：视图可以动态反映底层数据的变化。
+>
+> ### 详细说明
+>
+> ### 1. **什么是视图？**
+>
+> 视图是底层数据的一种特定表示或访问方式。它并不存储实际的数据，而是提供对现有数据的某种“窗口”或“视角”。视图可以限制或转换对数据的访问，同时动态反映底层数据的变化。
+>
+> - **类比**：视图就像是一面镜子，镜子本身并不存储图像，而是反射出实际物体的影像。如果你移动物体，镜子中的影像也会随之改变。
+> - **在编程中**：视图通常是对现有数据结构（如列表、集合、映射等）的一种封装或包装。
+>
+> ------
+>
+> ### 2. **视图的特点**
+>
+> 1. **动态性**
+>    视图是动态的，它会实时反映底层数据的变化。如果底层数据被修改，视图也会自动更新。
+> 2. **轻量级**
+>    视图本身不存储数据，只是提供对现有数据的访问方式，因此它的内存开销很小。
+> 3. **限制访问**
+>    视图可以限制对底层数据的访问，例如只允许读取部分数据，或者只允许修改部分数据。
+> 4. **接口一致性**
+>    视图通常与底层数据结构实现相同的接口，因此可以无缝替换底层数据。
+>
+> ------
+>
+> ### 3. **视图的常见用途**
+>
+> 1. **子列表视图**
+>    例如，Java 中的 `List.subList()` 方法返回一个子列表视图，该视图是原列表的一部分。
+> 2. **只读视图**
+>    例如，Java 中的 `Collections.unmodifiableList()` 方法返回一个只读视图，禁止对列表的修改。
+> 3. **映射视图**
+>    例如，Java 中的 `Map.keySet()` 方法返回一个键的视图，`Map.values()` 方法返回一个值的视图。
+> 4. **数据转换视图**
+>    例如，可以将一个列表转换为另一种数据类型的视图（如将字符串列表转换为整数列表）。
+>
+> ------
+>
+> ### 4. **视图的实现方式**
+>
+> 视图通常通过以下方式实现：
+>
+> 1. **封装底层数据**
+>    视图类内部持有一个对底层数据的引用，并通过该引用访问数据。
+> 2. **实现相同的接口**
+>    视图类通常与底层数据结构实现相同的接口，以提供一致的访问方式。
+> 3. **动态更新**
+>    视图类的方法会实时调用底层数据的方法，确保视图与底层数据保持一致。
+>
+> ### 示例
+>
+> 在 Java 中，`List.subList()` 方法返回一个视图，该视图是原列表的一部分。
+>
+> ```java
+> import java.util.ArrayList;
+> import java.util.List;
+> 
+> public class Main {
+>     public static void main(String[] args) {
+>         // 创建一个 ArrayList
+>         List<String> list = new ArrayList<>();
+>         list.add("A");
+>         list.add("B");
+>         list.add("C");
+>         list.add("D");
+> 
+>         // 创建一个子列表视图
+>         List<String> subList = list.subList(1, 3); // 包含索引 1 和 2
+> 
+>         // 修改子列表
+>         subList.set(0, "X"); // 将 "B" 改为 "X"
+> 
+>         // 查看原列表
+>         System.out.println("原列表: " + list); // 输出: [A, X, C, D]
+>     }
+> }
+> ```
+>
+> #### 示例 2：只读视图
+>
+> Java 中的 `Collections.unmodifiableList()` 方法返回一个只读视图。
+>
+> ```java
+> import java.util.ArrayList;
+> import java.util.Collections;
+> import java.util.List;
+> 
+> public class Main {
+>     public static void main(String[] args) {
+>         // 创建一个 ArrayList
+>         List<String> list = new ArrayList<>();
+>         list.add("A");
+>         list.add("B");
+> 
+>         // 创建一个只读视图
+>         List<String> readOnlyList = Collections.unmodifiableList(list);
+> 
+>         // 尝试修改只读视图（会抛出异常）
+>         try {
+>             readOnlyList.add("C"); // 抛出 UnsupportedOperationException
+>         } catch (UnsupportedOperationException e) {
+>             System.out.println("只读视图不允许修改！");
+>         }
+> 
+>         // 修改原列表
+>         list.add("C");
+> 
+>         // 查看只读视图
+>         System.out.println("只读视图: " + readOnlyList); // 输出: [A, B, C]
+>     }
+> }
+> ```
+>
+> **输出：**
+>
+> ```
+> 只读视图不允许修改！
+> 只读视图: [A, B, C]
+> ```
+>
+> **解释：**
+>
+> - `readOnlyList` 是 `list` 的一个只读视图，禁止对列表的修改。
+> - 修改 `list` 会动态反映在 `readOnlyList` 中。
+>
+> ------
+>
+> #### 示例 3：映射视图
+>
+> Java 中的 `Map.keySet()` 和 `Map.values()` 方法返回键和值的视图。
+>
+> ```java
+> import java.util.HashMap;
+> import java.util.Map;
+> import java.util.Set;
+> 
+> public class Main {
+>     public static void main(String[] args) {
+>         // 创建一个 HashMap
+>         Map<String, Integer> map = new HashMap<>();
+>         map.put("A", 1);
+>         map.put("B", 2);
+> 
+>         // 获取键的视图
+>         Set<String> keys = map.keySet();
+> 
+>         // 获取值的视图
+>         java.util.Collection<Integer> values = map.values();
+> 
+>         // 修改映射
+>         map.put("C", 3);
+> 
+>         // 查看键和值的视图
+>         System.out.println("键视图: " + keys); // 输出: [A, B, C]
+>         System.out.println("值视图: " + values); // 输出: [1, 2, 3]
+>     }
+> }
+> ```
+>
+> **输出：**
+>
+> ```java
+> 键视图: [A, B, C]
+> 值视图: [1, 2, 3]
+> ```
+>
+> **解释：**
+>
+> - `keys` 是 `map` 的键视图，`values` 是 `map` 的值视图。
+> - 修改 `map` 会动态反映在 `keys` 和 `values` 中。
+>
+> ### 优点
+>
+> - **灵活性**：可以动态创建数据的特定视图。
+> - **一致性**：视图会动态反映底层数据的变化。
+>
+> ### 缺点
+>
+> - **潜在的性能问题**：如果视图的实现依赖于底层数据，可能会导致性能问题。
+>
+> ------
+>
+> ## 总结
+>
+> | 模式       | 核心思想                           | 适用场景                   | 优点               | 缺点           |
+> | :--------- | :--------------------------------- | :------------------------- | :----------------- | :------------- |
+> | **委托**   | 将功能交给另一个类的对象来完成     | 需要复用其他类的功能       | 灵活性高，解耦     | 代码量增加     |
+> | **适配器** | 将不兼容的接口转换为兼容的接口     | 解决接口不兼容问题         | 兼容性强，复用性好 | 复杂性增加     |
+> | **视图**   | 提供对底层数据的特定表示或访问方式 | 需要动态创建数据的特定视图 | 灵活性高，动态更新 | 潜在的性能问题 |
+
