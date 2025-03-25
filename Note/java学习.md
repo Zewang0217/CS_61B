@@ -1,6 +1,18 @@
+---
+​---
+title: java与数据结构算法的学习（伯克利大学CS61B课程学习笔记）
+author: Zewang
+date: 2025/3
+tags:
+  - 数据结构算法
+  - java
+---
+
 [TOC]
 
+# 还需加强理解的地方
 
+[泛型方法 Generic Methods](#泛型方法 Generic Methods)
 
 
 
@@ -29,7 +41,9 @@
 
 + 隐式转换
 
-+ ```java
++ 代码原样式
+  
+  ```java
   public class BasicArrayList {
       public static void main(String[] args) {
         ArrayList<Integer> L = new ArrayList<Integer>();
@@ -41,8 +55,10 @@
       }
   }
   ```
-
-+ ```java
+  
++ 自动装箱、拆箱之后
+  
+  ```java
   public class BasicArrayList {
       public static void main(String[] args) {
         ArrayList<Integer> L = new ArrayList<Integer>();
@@ -52,7 +68,7 @@
       }
   }
   ```
-
+  
 + Java 隐式创建一个值为 20 的新 `Integer`，从而产生对等效调用 `blah（new Integer（20））` 的调用。此过程称为自动装箱。
 
 + 自动拆箱 
@@ -74,20 +90,26 @@
 
   它将自动拆箱整数，相当于调用 `Integer` 类的 `valueOf` 方法。
 
+  ------
+  
   
 
 #### 注意：
 
 + 在进行自动装箱和取消装箱时，需要记住以下几点：
-  + 数组从来都不是自动装箱或自动拆箱的。
+  + **数组**从来都不是自动装箱或自动拆箱的。
     例如，如果你有一个整数数组 `int[] x`，并尝试将其地址放入 `Integer[]` 类型的变量中，编译器将不允许你的程序编译。
-  + 自动装箱和拆箱也会对性能产生可衡量的影响。
+  + 自动装箱和拆箱也会对**性能**产生可衡量的影响。
     也就是说，依赖于自动装箱和拆箱的代码将比避免此类自动转换的代码慢。
-  + 包装类型使用的内存比基元类型多得多。在大多数现代计算机上，不仅您的代码必须保存对对象的 64 位引用，而且每个对象还需要 64 位开销，用于存储对象的动态类型等内容。
+  + 包装类型使用的**内存**比基元类型多得多。在大多数现代计算机上，不仅您的代码必须保存对对象的 64 位引用，而且每个对象还需要 64 位开销，用于存储对象的动态类型等内容。
+  
+    ------
+  
+    
 
-#### 扩大 Widening 
+#### 扩大  `Widening`
 
-+ 自动加宽基元类型
++ **自动加宽基元类型**
 
 + 例如：
   Java 中的 doubles 比 int 宽。如果我们有如下所示的功能：
@@ -107,31 +129,31 @@
 
   效果等同与 `blahDouble（（double） x）`
 
+  + 宽变窄需要手动
+
+  + 例如：
+
+    ```java
+    public static void blahInt(int x) {
+        System.out.println(“int: “ + x);
+    }
+    
+    double x = 20;
+    blahInt((int) x);
+    ```
   
-
-   + 宽变窄需要手动
-
-     + 例如：
-
-       ```java
-       public static void blahInt(int x) {
-           System.out.println(“int: “ + x);
-       }
-       
-       double x = 20;
-       blahInt((int) x);
-       ```
-
-       
+    ------
+    
+    
 
 ## 5.2 immutability 不变性
 
 ### 不可变数据类型
 
 + 其实例在实例化后**无法**以任何可观察的方式更改。
-+ 例如，Java 中的 `String` 对象是不可变的。无论如何，如果你有一个 `String` 实例，你可以在该 `String` 上调用任何方法，但它将完全保持不变。这意味着当 `String` 对象被连接时，原始的 String 都不会被修改 -- **而是返回一个全新的 `String` 对象**。
++ 例如，Java 中的 **`String` 对象**是不可变的。无论如何，如果你有一个 `String` 实例，你可以在该 `String` 上调用任何方法，但它将完全保持不变。这意味着当 `String` 对象被连接时，**原始的 String 都不会被修改** -- **而是返回一个全新的 `String` 对象**。
 
-+ 可变数据类型包括 `ArrayDeque` 和 `Planet` 等对象。
++ 可变数据类型包括 `ArrayDeque` 和 `Planet` 等对象。(ADT)
   我们可以在 `ArrayDeque` 中添加或删除项目，这些项目是可观察的更改。同样，`planet`的速度和位置可能会随时间而变化
 
 ### final
@@ -158,7 +180,11 @@
    public final ArrayDeque<String>() deque = new ArrayDeque<String>();
   ```
 
-  `deque` 变量是 final，永远不能重新分配，但它指向的数组 deque 对象可以改变！ArrayDeques 始终是可变的！
+  `deque` 变量是 final，永远不能重新分配，但它指向的数组 deque 对象可以改变！`ArrayDeques` 始终是可变的！
+  
+  ------
+  
+  
 
 ## 5.3 创建另一个泛型类
 
@@ -168,9 +194,9 @@
 
 + `ArrayMap `见 `myCode`中
 
-+ excercies
++ `excercise`
 
-  + **Excercise 5.2.2** What would we need to do in order to call `assertEquals(long, long)`? A.) Widen `expected` to a `long` B.) Autobox `expected` to a `Long` C.) Unbox `am.get(2)` D.) Widen the unboxed `am.get(2)` to long
+  + **`Excercise 5.2.2`** What would we need to do in order to call `assertEquals(long, long)`? A.) Widen `expected` to a `long` B.) Autobox `expected` to a `Long` C.) Unbox `am.get(2)` D.) Widen the unboxed `am.get(2)` to long
 
   + **题目：如何调用 `assertEquals(long, long)`？**
 
@@ -216,7 +242,7 @@
 
     
 
-+ **Excercise 5.2.3** How would we make it work with `assertEquals(Object, Object)`?
++ **`Excercise 5.2.3`** How would we make it work with `assertEquals(Object, Object)`?
 
 + **题目：如何让 `assertEquals(Object, Object)` 工作？**
 
@@ -234,7 +260,7 @@
 
   
 
-+ **Excercise 5.2.4** How do we make the code compile with casting?
++ **`Excercise 5.2.4`** How do we make the code compile with casting?
 
 + **题目：如何使用 \**显式类型转换（casting）\** 使代码编译？**
 
@@ -264,6 +290,10 @@
 
 ### 泛型方法 Generic Methods
 
+[^这里还需要再理解]:
+
+
+
 + 新语法
 
 ```java
@@ -272,10 +302,13 @@ public static <K extends Comparable<K>, V> K maxKey(Map61B<K, V> map) {...}
 
 `K 扩展了 Comparable<K>` 意味着键必须实现类似的接口，并且可以与其他 K 进行比较。我们需要在 `Comparable` 之后包含 `<K>`，因为 `Comparable` 本身就是一个通用接口！因此，我们必须指定我们想要什么样的可比物。在本例中，我们希望将 K 与 K 进行比较。
 
-+ 为什么`extends`而不是`implement`
-+ 在泛型上下文中，`extends` 用于指定类型上界（type upper bound）。它表示泛型类型参数必须是指定类型或其子类型。这里的 “类型” 既可以是类，也可以是接口。当使用 `extends` 与接口搭配时，它意味着泛型类型参数必须实现该接口。
-+ extends 只是陈述了一个事实：你必须是你要扩展的任何内容的子类。
-+ 当与泛型一起使用时（如在泛型方法标头中），extends 会施加约束，而不是授予新功能。
++ 为什么`extends`而不是`implement`?
+
+  在泛型上下文中，`extends` 用于指定类型上界（type upper bound）。它表示泛型类型参数必须是指定类型或其子类型。这里的 “类型” 既可以是类，也可以是接口。当使用 `extends` 与接口搭配时，它意味着泛型类型参数必须实现该接口。
+
++ `extends` 只是陈述了一个事实：你必须是你要扩展的任何内容的子类。
+
++ 当与泛型一起使用时（如在泛型方法标头中），`extends` 会施加约束，而不是授予新功能。
 
 + `extends` 和 `implements` 的使用场景差异
 
@@ -538,7 +571,80 @@ We’ve seen four new features of Java that make generics more powerful:
 
 ------
 
-# `exceptions, iterators, iterables`...
++ `ArrayMap`的实现
+
+```java
+package Map61B;
+
+import org.junit.Assert.*;
+import java.util.List;
+import java.util.ArrayList;
+import org.junit.Test;
+
+
+import static org.junit.Assert.*;
+
+public class ArrayMap<K, V> implements Map61B<K, V> {
+    private K[] keys;
+    private V [] values;
+    int size;
+
+    public ArrayMap() {
+        keys = (K[]) new Object[100];
+        values = (V[]) new Object[100];
+        size = 0;
+    }
+
+    /**返回键键对应的索引
+     * 如果没有就返回-1*/
+    private int KeyIndex(K key) {
+        for (int i = 0; i < size; i++) {
+            if (keys[i].equals(key)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public boolean containsKey(K key) {
+        int index = KeyIndex(key);
+        return index > -1;
+    }
+
+    public void put(K key, V value) {
+        int index = KeyIndex(key);
+        if (index == -1) {
+            keys[size] = key;
+            values[size] = value;
+            size++;
+        } else {
+            values[index] = value;
+        }
+    }
+
+    public V get(K key) {
+        int index = KeyIndex(key);
+        return values[index];
+    }
+
+    public int size() {
+        return size;
+    }
+
+    public List<K> keys() {
+        List<K> KeyList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            KeyList.add(keys[i]);
+        }
+        return KeyList;
+    }
+
+}
+```
+
+
+
+# 六、`exceptions, iterators, iterables`...
 
 ## 6.1 列表、集合、数组集
 

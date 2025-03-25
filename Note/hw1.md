@@ -151,7 +151,9 @@ Karplus-Strong算法简单来说就是以下三个步骤：
 当你觉得`GuitarString`应该能正常工作后，将其余的`.java.skeleton`文件重命名为`.java`，然后尝试运行`TTFAF`。确保打开声音！
 
 你可以阅读`GuitarPlayer`和`TTFAF`类，了解它们的工作原理。特别是`TTFAF`类中（以注释掉的代码形式）包含了另一种使用方式的示例。
+
 #### GuitarHeroLite
+
 现在你应该也能够使用`GuitarHero`类了。运行它将提供一个界面，允许用户（也就是你！）使用`synthesizer`包中的`GuitarString`类以交互方式播放声音。
 
 考虑编写一个`GuitarHero`程序，它类似于`GuitarHeroLite`，但支持从110Hz到880Hz的全音阶中的37个音符。使用以下37个键来表示键盘，从最低音到最高音：
