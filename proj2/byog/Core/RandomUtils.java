@@ -46,7 +46,7 @@ public class RandomUtils {
      * @throws IllegalArgumentException if {@code n <= 0}
      */
     public static long uniform(Random random, long n) {
-        if (n <= 0L) {
+        if (n <= 0L) { // 0L是0的long long格式
             throw new IllegalArgumentException("argument must be positive: " + n);
         }
 
@@ -154,6 +154,7 @@ public class RandomUtils {
     /**
      * Returns a random real number from a Gaussian distribution with mean &mu;
      * and standard deviation &sigma;.
+     * 返回一个服从均值为 μ、标准差为 σ 的高斯分布（即正态分布）的随机实数。
      *
      * @param mu    the mean
      * @param sigma the standard deviation

@@ -21,6 +21,7 @@ hs_err_pid*
 *~
 .fuse_hidden*
 .directory
+.obsidian/
 .Trash-*
 .nfs*
 *.DS_Store
