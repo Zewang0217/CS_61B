@@ -2772,3 +2772,468 @@ $a_i$ 是一个任意常数，这意味着我们可以选择它。如果我们**
 - 大O有时会在本应使用大Θ来更精确表述的情况下被通俗使用。
 - 均摊分析提供了一种证明操作平均成本的方法。
 - 如果我们选择 $a_i$ 使得 $\Phi_i$ 永远不会为负，并且 $a_i$ 对所有 $i$ 都是常数，那么均摊成本就是实际成本的上界。 
+
+------
+
+
+
+## 9.1 不相交集
+
+不相交集（Disjoint Sets）简介  
+若两个集合无共同元素，则称它们为不相交集。不相交集数据结构（又称并查集）用于维护由固定数量元素组成的多个互不相交的子集，主要支持两种操作：  
+
+`connect(x, y)`: 连接x和y（又称合并操作）  
+`isConnected(x, y)`: 若x和y处于同一集合则返回true  
+
+该数据结构初始化时，每个元素自成一个独立子集。通过调用`connect(x, y)`可合并元素所在的子集。  
+
+示例：假设有四个元素A、B、C、D  
+初始状态：  
+
+（图示：四个独立集合{A}{B}{C}{D}）  
+
+调用connect(A, B)后：  
+
+（图示：合并为{AB}{C}{D}）  
+
+此时验证连接状态：  
+`isConnected(A, B) -> true`  
+`isConnected(A, C) -> false ` 
+
+再调用connect(A, D)后：  
+
+（图示：合并为{ABD}{C}）  
+
+验证连接状态：  
+`isConnected(A, D) -> true  `
+`isConnected(A, C) -> false  `
+
+基于上述理解，我们正式定义并查集接口（暂时仅处理非负整数集合，实际应用可通过整数映射扩展）：  
+
+```java
+public interface DisjointSets {
+    /** 连接元素p和q */
+    void connect(int p, int q);
+
+    /** 检测元素p和q是否连通 */
+    boolean isConnected(int p, int q); 
+}
+```
+
+本章不仅将学习这一精妙数据结构的实现，还将见证其设计方案的演进过程。我们将逐步探讨四种实现方案：  
+快速查找 → 快速合并 → 带权快速合并 → 带路径压缩的带权快速合并  
+通过分析不同设计方案对时间复杂度和代码复杂度的影响，深入理解算法优化的核心思想。  
+
+（注：图示部分保留原文描述方式，建议配套原课程图示理解。关键术语如"connect/isConnected"采用"连接/连通"的译法保持操作语义清晰，接口代码保留英文形式符合编程惯例）
+
+------
+
+
+
+## 9.2快速查找法（Quick Find）
+
+为了实现 `DisjointSets` 接口的功能，我们需要有效管理元素的集合归属。  
+
+#### **ListOfSets（初步想法）**
+
+最直观的方式可能是用 `List<Set<Integer>>` 存储各个子集。例如，初始时有 6 个元素，数据结构为 `[{0}, {1}, {2}, {3}, {4}, {5}, {6}]`。  
+
+但执行 `connect(5, 6)` 时，必须遍历最多 `N` 个子集才能找到 `5` 和 `6`，时间复杂度为 `O(N)`。此外，代码实现会较为复杂。  
+
+**关键启示**：初始设计的选择直接影响代码复杂度和运行效率。  
+
+---
+
+#### **快速查找法（Quick Find）**
+
+改用**单数组（`int[]`）**表示集合关系：  
+- **数组索引**代表元素  
+- **数组值**代表该元素所属的集合编号  
+
+例如，集合 `{0, 1, 2, 4}`、`{3, 5}`、`{6}` 可表示为：  
+
+```
+索引: 0 1 2 3 4 5 6  
+值:  [4,4,4,5,4,5,6]  
+```
+（集合编号的具体数值不重要，只需保证同集合元素的值相同）  
+
+##### **操作实现**  
+1. **`connect(x, y)`**  
+   合并 `x` 和 `y` 所在的集合。例如，当前 `id[2] = 4` 和 `id[3] = 5`，执行 `connect(2, 3)` 后，所有值为 `4` 或 `5` 的元素被统一赋值为 `5`：  
+
+   ```
+   更新后数组: [5,5,5,5,5,5,6]  
+   ```
+   **时间复杂度**：`Θ(N)`（需遍历整个数组）  
+
+2. **`isConnected(x, y)`**  
+   直接检查 `id[x] == id[y]`。  
+   **时间复杂度**：`Θ(1)`  
+
+**为什么叫“Quick Find”？**  
+因为查询操作（`isConnected`）是常数时间！  
+
+---
+
+### **性能对比与代码实现**  
+
+| 实现方式     | 构造器 | `connect` | `isConnected` |
+| ------------ | ------ | --------- | ------------- |
+| `ListOfSets` | `Θ(N)` | `O(N)`    | `O(N)`        |
+| `QuickFind`  | `Θ(N)` | `Θ(N)`    | `Θ(1)`        |
+
+```java
+public class QuickFindDS implements DisjointSets {
+    private int[] id;
+
+    /** 初始化：每个元素自成一个集合 Θ(N) */
+    public QuickFindDS(int N) {
+        id = new int[N];
+        for (int i = 0; i < N; i++) {
+            id[i] = i; // 初始时集合编号=元素自身
+        }
+    }
+
+    /** 合并：将p所在集合的所有元素改为q的集合编号 Θ(N) */
+    public void connect(int p, int q) {
+        int pid = id[p];
+        int qid = id[q];
+        for (int i = 0; i < id.length; i++) {
+            if (id[i] == pid) {
+                id[i] = qid; // 统一集合编号
+            }
+        }
+    }
+
+    /** 查询：检查是否同属一个集合 Θ(1) */
+    public boolean isConnected(int p, int q) {
+        return id[p] == id[q];
+    }
+}
+```
+
+**缺点**：虽然查询快，但每次合并需遍历整个数组，对大规模数据效率低。后续将介绍更优的**快速合并（Quick Union）**优化这一问题。  
+
+（注：代码保留英文变量名如 `id` 符合编程惯例，注释中使用中文解释关键逻辑。复杂度符号 `Θ` 表示严格上下界，区别于大O符号的渐进上界）
+
+------
+
+## 9.3 Quick Union
+
+### 快速合并法（Quick Union）  
+
+为了优化 `connect` 操作的效率，我们引入**树形结构**表示集合，仍使用单数组 `parent[]` 存储：  
+- **数组索引**代表元素  
+- **数组值**代表其父节点索引（若为根节点，则值为负数或自身，具体实现可能不同）  
+
+例如，集合 `{0, 1, 2, 4}`、`{3, 5}`、`{6}` 可表示为以下树结构及对应数组：  
+```
+树形结构：
+0      3      6
+| \    |
+1  2   5
+|
+4
+
+数组表示（假设根节点值为-1）：
+索引: 0 1 2 3 4 5 6  
+值:  [-1,0,0,-1,1,3,-1] 
+```
+
+#### **核心操作**  
+1. **`find(x)`（辅助函数）**  
+   递归或迭代查找 `x` 的根节点。例如：  
+   - `find(4)` → 1 → 0 → 返回 `0`  
+   - `find(5)` → 3 → 返回 `3`  
+   **时间复杂度**：`O(树的高度)`  
+
+2. **`connect(x, y)`**  
+   合并两棵树：将 `x` 的根节点指向 `y` 的根节点。例如 `connect(5, 2)`：  
+   - `find(5)` → 3  
+   - `find(2)` → 0  
+   - 更新 `parent[3] = 0`  
+   **时间复杂度**：`O(树的高度)`（主要开销在 `find`）  
+
+3. **`isConnected(x, y)`**  
+   检查两元素是否同根：`find(x) == find(y)`  
+   **时间复杂度**：`O(树的高度)`  
+
+#### **性能分析**  
+| 实现方式     | 构造器 | `connect` | `isConnected` |
+| ------------ | ------ | --------- | ------------- |
+| `QuickFind`  | `Θ(N)` | `Θ(N)`    | `Θ(1)`        |
+| `QuickUnion` | `Θ(N)` | `O(N)`    | `O(N)`        |
+
+**问题**：树可能退化为链（如 `0→1→2→3→4`），导致 `find` 的最坏时间复杂度为 `O(N)`。  
+
+#### **代码实现**  
+```java
+public class QuickUnionDS implements DisjointSets {
+    private int[] parent;
+
+    /** 初始化：每个元素自成一棵树（根节点值为-1）Θ(N) */
+    public QuickUnionDS(int num) {
+        parent = new int[num];
+        for (int i = 0; i < num; i++) {
+            parent[i] = -1; // 初始时所有元素为根节点
+        }
+    }
+
+    /** 查找根节点：O(树高度) */
+    private int find(int p) {
+        while (parent[p] >= 0) { // 非根节点时继续向上
+            p = parent[p];
+        }
+        return p;
+    }
+
+    /** 合并：将p的根节点指向q的根节点 O(树高度) */
+    @Override
+    public void connect(int p, int q) {
+        int rootP = find(p);
+        int rootQ = find(q);
+        parent[rootP] = rootQ; // 简单合并，可能增加树高度
+    }
+
+    /** 查询：检查是否同根 O(树高度) */
+    @Override
+    public boolean isConnected(int p, int q) {
+        return find(p) == find(q);
+    }
+}
+```
+
+**改进方向**：  
+1. **按秩合并（Weighted Quick Union）**：合并时让小树挂在大树下，控制树高度。  
+2. **路径压缩（Path Compression）**：`find` 时扁平化树结构，进一步降低高度。  
+
+（注：代码中根节点判断逻辑可根据需求调整，如初始值设为 `-1` 或自身索引。注释中明确标注时间复杂度，区分最好/最坏情况。）
+
+------
+
+## 9.4带权快速合并（Weighted Quick Union, WQU）
+
+#### **核心思想**
+在快速合并（Quick Union）的基础上，通过**按树大小合并**（总是将小树的根节点挂到大树下），确保树的最大高度为 **O(log N)**，从而优化 `find`、`connect` 和 `isConnected` 的时间复杂度。
+
+---
+
+#### **关键改进**
+1. **记录树的大小**  
+   - 用数组 `parent[]` 存储父节点索引，**根节点的值设为 `-size`**（表示树的大小）。  
+   - 例如：`parent[3] = -5` 表示节点 `3` 是根节点，其树下共有 `5` 个元素。
+
+2. **合并策略**  
+   - 比较两棵树的大小，**将小树的根指向大树的根**。  
+   - 合并后更新大树的大小。
+
+---
+
+#### **操作实现**
+1. **`find(x)`**  
+   与 Quick Union 相同，沿父链找到根节点。  
+   **时间复杂度**：`O(log N)`（因树高度被控制）。
+
+2. **`connect(x, y)`**  
+   - 找到 `x` 和 `y` 的根节点 `rootX` 和 `rootY`。  
+   - 比较树大小：  
+     - 若 `size(rootX) < size(rootY)`，将 `rootX` 挂到 `rootY` 下。  
+     - 否则，将 `rootY` 挂到 `rootX` 下。  
+   - 更新合并后的树大小。  
+   **时间复杂度**：`O(log N)`（主要开销在 `find`）。
+
+3. **`isConnected(x, y)`**  
+   检查 `find(x) == find(y)`。  
+   **时间复杂度**：`O(log N)`。
+
+---
+
+#### **性能对比**
+| 实现方式                 | 构造器 | `connect`  | `isConnected` |
+| ------------------------ | ------ | ---------- | ------------- |
+| QuickFind                | `Θ(N)` | `Θ(N)`     | `Θ(1)`        |
+| QuickUnion               | `Θ(N)` | `O(N)`     | `O(N)`        |
+| **Weighted Quick Union** | `Θ(N)` | `O(log N)` | `O(log N)`    |
+
+---
+
+#### **为什么树高是 O(log N)？**
+- 每次合并时，小树挂到大树下，**树的规模至少翻倍**。  
+- 最坏情况下，树需要合并 `log₂N` 次才能包含所有 `N` 个节点，因此树高不超过 `log₂N`。  
+
+**示例**：  
+- 初始：`{0}, {1}, {2}, ..., {N-1}`（每个节点独立）。  
+- 合并 `0` 和 `1` → 树 `{0,1}`（大小=2）。  
+- 合并 `{0,1}` 和 `2` → 树 `{0,1,2}`（大小=3）。  
+- ...  
+- 最终树的最大高度为 `log₂N`。
+
+---
+
+#### **代码框架（Lab 6 任务）**
+```java
+public class WeightedQuickUnionDS implements DisjointSets {
+    private int[] parent;
+
+    public WeightedQuickUnionDS(int N) {
+        parent = new int[N];
+        for (int i = 0; i < N; i++) {
+            parent[i] = -1; // 初始时每个节点是根，大小为1（用-1表示）
+        }
+    }
+
+    private int find(int p) {
+        while (parent[p] >= 0) { // 非根节点时继续向上
+            p = parent[p];
+        }
+        return p;
+    }
+
+    @Override
+    public void connect(int p, int q) {
+        int rootP = find(p);
+        int rootQ = find(q);
+        if (rootP == rootQ) return; // 已在同一集合
+
+        // 比较树大小（注意：根节点的值为 -size）
+        if (parent[rootP] < parent[rootQ]) { // rootP的树更大
+            parent[rootP] += parent[rootQ]; // 更新大小
+            parent[rootQ] = rootP;         // 小树rootQ挂到大树rootP下
+        } else {
+            parent[rootQ] += parent[rootP];
+            parent[rootP] = rootQ;
+        }
+    }
+
+    @Override
+    public boolean isConnected(int p, int q) {
+        return find(p) == find(q);
+    }
+}
+```
+
+---
+
+#### **为何不用树高度合并？**
+虽然按高度合并也能达到 `O(log N)`，但：
+1. **实现复杂度更高**：需额外维护高度数组。  
+2. **性能相同**：按大小合并已足够优化。  
+
+---
+
+#### **下一步优化：路径压缩**
+在 `find` 操作时扁平化树结构，可进一步降低树高至**近似常数**（见 WQU with Path Compression）。
+
+
+
+------
+
+## 9.5带路径压缩的按权合并（WQUPC）
+
+#### **核心思想**
+在按权合并（WQU）的基础上，**在 `find` 操作时扁平化树结构**，使得后续查询几乎只需常数时间。这是通过**路径压缩（Path Compression）**实现的。
+
+---
+
+#### **路径压缩的原理**
+1. **操作时机**：  
+   每次调用 `find(x)` 时，在从 `x` 向上查找根节点的过程中，**将途经的所有节点直接挂到根节点下**。  
+   - **效果**：树的高度被动态压缩，后续操作更快。
+
+2. **图示例子**：  
+   假设原树结构为 `5 → 4 → 3 → 2 → 1 → 0`（高度=5），调用 `find(5)` 后：  
+   - **压缩前**：需遍历 5 层到达根 `0`。  
+   - **压缩后**：`5` 和 `4`、`3`、`2`、`1` 全部直接指向 `0`，树高变为 1。  
+
+---
+
+#### **时间复杂度分析**
+- **平均时间复杂度**：  
+  经过多次操作后，`find`、`connect` 和 `isConnected` 的**均摊时间复杂度**趋近于 **O(α(N))**。  
+  - **α(N)** 是反阿克曼函数，增长极其缓慢（对于所有实际应用的 `N`，α(N) ≤ 5）。  
+  - 因此，可以认为这些操作是**近似常数时间**的。
+
+- **数学背景**：  
+  严格证明需复杂分析（如势能法），但直观理解是路径压缩大幅减少了未来操作的路径长度。
+
+---
+
+#### **代码实现**
+```java
+public class WQUWithPathCompressionDS implements DisjointSets {
+    private int[] parent;
+
+    public WQUWithPathCompressionDS(int N) {
+        parent = new int[N];
+        for (int i = 0; i < N; i++) {
+            parent[i] = -1; // 初始化：每个元素是根，大小为1
+        }
+    }
+
+    /** find + 路径压缩 */
+    private int find(int p) {
+        if (parent[p] < 0) {
+            return p; // 找到根节点
+        }
+        // 递归压缩路径：将当前节点的父节点设为根
+        parent[p] = find(parent[p]); 
+        return parent[p];
+    }
+
+    @Override
+    public void connect(int p, int q) {
+        int rootP = find(p);
+        int rootQ = find(q);
+        if (rootP == rootQ) return;
+
+        // 按权合并（小树挂大树）
+        if (parent[rootP] < parent[rootQ]) { // rootP的树更大
+            parent[rootP] += parent[rootQ];
+            parent[rootQ] = rootP;
+        } else {
+            parent[rootQ] += parent[rootP];
+            parent[rootP] = rootQ;
+        }
+    }
+
+    @Override
+    public boolean isConnected(int p, int q) {
+        return find(p) == find(q);
+    }
+}
+```
+
+---
+
+#### **关键改进点**
+1. **递归路径压缩**：  
+   `find` 方法通过递归将路径上的节点直接指向根，代码简洁高效。  
+   - 例如：`find(5)` 会将 `5 → 4 → 0` 压缩为 `5 → 0` 和 `4 → 0`。
+
+2. **保留按权合并**：  
+   合并时仍优先挂接小树，保证树高平衡。
+
+---
+
+#### **性能对比**
+| 实现方式                   | `isConnected`       | `connect`           |
+| -------------------------- | ------------------- | ------------------- |
+| Quick Find                 | Θ(1)                | Θ(N)                |
+| Quick Union                | O(N)                | O(N)                |
+| Weighted Quick Union (WQU) | O(log N)            | O(log N)            |
+| **WQU + Path Compression** | **O(α(N))** (≈常数) | **O(α(N))** (≈常数) |
+
+---
+
+#### **为什么路径压缩有效？**
+- **平摊分析**：虽然单次 `find` 可能较慢（需递归压缩路径），但后续操作受益于扁平化结构。  
+- **实际效果**：在动态操作中，树高几乎不会超过常数级别。
+
+---
+
+#### **应用场景**
+- **大规模数据**：如社交网络中的好友关系、图像处理中的像素连通性。  
+- **高频查询**：需要快速响应的场景（如游戏中的实时连通性判断）。  
+
+> **注**：Lab 6 的任务是结合按权合并和路径压缩，实现高效的并查集。

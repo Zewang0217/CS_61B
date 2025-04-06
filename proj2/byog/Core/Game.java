@@ -83,8 +83,7 @@ public class Game {
 
     public void operation() {
         while (true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char c = StdDraw.nextKeyTyped();
+            if (StdDraw.hasNextKeyTyped()) {d
                 // 保存进度
                 if (c == 'Q') {
                     String filename = "file.ser";
